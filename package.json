@@ -1,14 +1,24 @@
 {
-  "name": "linter.luacheck",
-  "title": "Luacheck",
+  "name": "hirse.luacheck",
+  "title": "Brackets Luacheck",
   "description": "Adds Luacheck support to Brackets.",
-  "homepage": "",
+  "homepage": "https://github.com/Hirse/brackets-luacheck",
+  "repository": "Hirse/brackets-luacheck",
   "version": "1.0.0",
-  "keywords": ["lint", "linting", "linter"],
+  "keywords": [
+    "lint",
+    "linter",
+    "linting",
+    "lua"
+  ],
   "categories": "linting",
-  "author": "Malcolm Taylor <malcolm3141@gmail.com>",
+  "author": "Jan Pilzer (https://github.com/Hirse)",
   "license": "MIT",
   "engines": {
-    "brackets": ">=0.38.0"
+    "brackets": ">=1.5.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-compress": "^0.14.0"
   }
 }

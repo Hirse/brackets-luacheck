@@ -1,60 +1,59 @@
-/*
- * Copyright (c) 2015 Malcolm Taylor
- *
- * See the file LICENSE for copying permission.
- */
-
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
-/* global define, brackets, $, JSHINT */
 define(function (require, exports, module) {
-  "use strict";
+    "use strict";
 
-  var CodeInspection      = brackets.getModule("language/CodeInspection"),
-      PreferencesManager  = brackets.getModule("preferences/PreferencesManager"),
-      ExtensionUtils      = brackets.getModule("utils/ExtensionUtils"),
-      NodeDomain          = brackets.getModule("utils/NodeDomain"),
-      pm = PreferencesManager.getExtensionPrefs("jshint"),
-      options = {},
-      globals_arg = '';
+    /* beautify preserve:start */
+    var CodeInspection  = brackets.getModule("language/CodeInspection");
+    var LanguageManager = brackets.getModule("language/LanguageManager");
+    var ExtensionUtils  = brackets.getModule("utils/ExtensionUtils");
+    var NodeDomain      = brackets.getModule("utils/NodeDomain");
+    /* beautify preserve:end */
 
-  pm.definePreference("options", "object", {}).on("change", function () {
-    options = pm.get("options");
-  });
+    var luacheckDomain = new NodeDomain("luacheck", ExtensionUtils.getModulePath(module, "node/domain"));
 
-  pm.definePreference("globals", "object", {}).on("change", function () {
-    globals_arg = '';
-    $.each(pm.get("globals"), function(name, value) {
-      if(value)   globals_arg += ' ' + name;
-    });
-    if(globals_arg)
-      globals_arg = '--globals' + globals_arg;
-  });
+    /**
+     * Lint the file asynchronously.
+     * @param   {String}     text     Text of the file
+     * @param   {String}     fullPath Path to the file
+     * @returns {$.Deferred} jQuery promise which will be resolved to the errors.
+     */
+    function scanFileAsync(text, fullPath) {
+        var deferred = new $.Deferred();
 
-  var luacheckDomain = new NodeDomain("luacheck", ExtensionUtils.getModulePath(module, "node/luacheck"));
+        luacheckDomain.exec("runLuacheck", fullPath).done(function (items) {
+            var errors = items.map(function (item) {
+                return {
+                    pos: item.pos,
+                    message: item.message,
+                    type: item.code === "W" ? CodeInspection.Type.WARNING : CodeInspection.Type.ERROR,
+                };
+            });
 
-  // Asynch linter
-  function scanFileAsync(text, fullPath) {
-    var deferred = new $.Deferred();
-    
-    luacheckDomain.exec('runLuacheck', text, globals_arg).done(function(items) {
-      var errors = [];
-      items.forEach(function(item) {
-        errors.push({
-          pos: item.pos,
-          message: item.message,
-          type: (item.code && /\(W/.test(item.code)) ? CodeInspection.Type.WARNING : CodeInspection.Type.ERROR,
+            deferred.resolve({
+                errors: errors
+            });
+        }).fail(function (err) {
+            deferred.reject(err);
         });
-      });
-      deferred.resolve({ errors: errors });
-    }).fail(function(err) {
-      console.log('[luacheck] failed to run luacheck.runLuacheck', err);
-      deferred.reject(err);
-    });
-    return deferred.promise();
-  }
+        return deferred.promise();
+    }
 
-  CodeInspection.register("lua", {
-    name: "Luacheck",
-    scanFileAsync: scanFileAsync
-  });
+    CodeInspection.register("lua", {
+        name: "Luacheck",
+        scanFileAsync: scanFileAsync
+    });
+
+    var Language = LanguageManager.getLanguage("lua");
+    if (Language) {
+        Language.addFileName(".luacheckrc");
+
+    } else {
+        LanguageManager.defineLanguage("lua", {
+            name: "Lua",
+            mode: "lua",
+            fileExtensions: ["lua"],
+            fileNames: [".luacheckrc"],
+            lineComment: ["--"],
+            blockComment: ["--[[", "]]"]
+        });
+    }
 });

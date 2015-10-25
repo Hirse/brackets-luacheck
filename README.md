@@ -1,9 +1,26 @@
-brackets-luacheck
-=================
+# Brackets Luacheck
+[Brackets][Brackets] Extension to enable Luacheck support.
 
-A Brackets extension to enable Luacheck support. To install, place in your ```brackets/src/extensions/user``` folder.
+## Installation
+### Latest Release
+To install the latest _release_ of this extension use the built-in Brackets [Extension Manager][Brackets Extension Manager] which downloads the extension from the [Brackets Extension Registry][Brackets Extension Registry].
 
-You must have luacheck installed and available in the path. The easiest way to do this is to install [Luarocks](https://luarocks.org/), and install luacheck with luarocks.
-On Windows, you may also need to adjust your global path environment variable to include the luarocks system tree.
+### Latest Commit
+To install the latest _commit_ of this extension use the built-in Brackets [Extension Manager][Brackets Extension Manager] which has a function to `Install from URL...` using this link:
+```
+https://github.com/Hirse/brackets-luacheck/archive/master.zip
+```
 
-Support for globals is provided from the preferences file, however it is better to use the inline options for luacheck, and a .luacheckrc file in your project root.
+## Dependencies
+You must have [Luacheck](Luacheck) installed and available in the path.
+The easiest way to do this is to install [LuaRocks](LuaRocks), and [install Luacheck with LuaRocks](https://github.com/mpeterv/luacheck#installation):
+```
+luarocks install luacheck
+```
+
+[Brackets]: http://brackets.io
+[Brackets Extension Manager]: https://github.com/adobe/brackets/wiki/Brackets-Extensions
+[Brackets Extension Registry]: https://brackets-registry.aboutweb.com
+[Luacheck]: https://github.com/mpeterv/luacheck
+[LuaRocks]: https://luarocks.org
+[MIT]: http://opensource.org/licenses/MIT
